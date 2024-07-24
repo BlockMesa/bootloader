@@ -20,9 +20,9 @@ local function boot(kernel,timeout,name,...)
 	local success, response = pcall(os.run,{},kernel,...)
 	if not success then
 		printError(response)
-		while true do
-			sleep() 
-		end
+	end
+	while true do
+		sleep() 
 	end
 end
 local function startBoot(bootDrive)
