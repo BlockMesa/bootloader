@@ -3,41 +3,54 @@
 local parentDir = debug.getinfo(1).source:match("@?(.*/)")
 local bootFile = ""
 local function boot(kernel,timeout,name,...)
-	term.write("boot:")
+	local kernel1 = ""
 	parallel.waitForAny(function()
-		while true do
-			local _, key = os.pullEvent("key")
-			if key == keys.enter then
-				break
-			end
-		end
+		term.write("boot:")
+		kernel1 = read()
 	end,
 	function()
 		sleep(tonumber(timeout))
 	end)
+	if kernel1 ~= nil and kernel1 ~= "" then
+		kernel = kernel1
+	end
 	term.setCursorPos(1,2)
 	term.write("Loading "..kernel)
 	local loadedKernel
 	parallel.waitForAny(function()
 		while true do
-			term.write(".")
 			sleep()
+			term.write(".")
 		end
 	end,
 	function()
 		loadedKernel = loadfile(kernel)
 	end)
 	print("")
-	print("Running file")
-	local success, response = pcall(loadedKernel,...)
-	if not success then
-		printError(response)
+	if not loadedKernel then
+		print("Failure loading file")
+		while true do
+			sleep() 
+		end
+	else
+		print("Running file")
+		local success, response = pcall(loadedKernel,...)
+		if not success then
+			printError(response)
+		end
+		while true do
+			sleep() 
+		end
 	end
-	while true do
-		sleep() 
-	end
+
 end
 local function startBoot(bootDrive,version)
+	local bootFunc = load(string.dump(boot))
+	if not bootFunc then
+		while true do
+			sleep()
+		end
+	end
 	term.write("L")
 	if not fs.exists(parentDir.."/map.json") then
 		while true do
@@ -67,7 +80,7 @@ local function startBoot(bootDrive,version)
 	file.close()
 	term.write("O")
 	term.write(" "..version.." ")
-	boot(bootDrive..descriptor.bootfile,descriptor.timeout,descriptor.name,table.unpack(descriptor.args))
+	bootFunc(bootDrive..descriptor.bootfile,descriptor.timeout,descriptor.name,table.unpack(descriptor.args))
 end
 if #{...} ~= 0 then
 	startBoot(...)

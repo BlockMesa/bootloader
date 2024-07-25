@@ -3,7 +3,7 @@ local oldPull = os.pullEvent
 local oldPullRaw = os.pullEventRaw
 _G.os.pullEventOld = oldPull
 _G.os.pullEvent = os.pullEventRaw
-local version = "4.3"
+local version = "4.4"
 
 local function boot()
 	term.clear()
