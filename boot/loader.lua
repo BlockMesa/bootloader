@@ -3,8 +3,7 @@
 local parentDir = debug.getinfo(1).source:match("@?(.*/)")
 local bootFile = ""
 local function boot(kernel,timeout,name,...)
-	term.setCursorPos(1,2)
-	print("Hit RETURN or wait "..timeout.." seconds to load "..name..".")	
+	term.write("boot:")
 	parallel.waitForAny(function()
 		while true do
 			local _, key = os.pullEvent("key")
@@ -16,8 +15,21 @@ local function boot(kernel,timeout,name,...)
 	function()
 		sleep(tonumber(timeout))
 	end)
+	term.setCursorPos(1,2)
+	term.write("Loading "..kernel)
+	local loadedKernel
+	parallel.waitForAny(function()
+		while true do
+			term.write(".")
+			sleep()
+		end
+	end,
+	function()
+		loadedKernel = loadfile(kernel)
+	end)
 	print("")
-	local success, response = pcall(os.run,{},kernel,...)
+	print("Running file")
+	local success, response = pcall(loadedKernel,...)
 	if not success then
 		printError(response)
 	end
@@ -25,7 +37,7 @@ local function boot(kernel,timeout,name,...)
 		sleep() 
 	end
 end
-local function startBoot(bootDrive)
+local function startBoot(bootDrive,version)
 	term.write("L")
 	if not fs.exists(parentDir.."/map.json") then
 		while true do
@@ -54,6 +66,7 @@ local function startBoot(bootDrive)
 	end
 	file.close()
 	term.write("O")
+	term.write(" "..version.." ")
 	boot(bootDrive..descriptor.bootfile,descriptor.timeout,descriptor.name,table.unpack(descriptor.args))
 end
 if #{...} ~= 0 then

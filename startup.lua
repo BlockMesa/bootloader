@@ -3,6 +3,7 @@ local oldPull = os.pullEvent
 local oldPullRaw = os.pullEventRaw
 _G.os.pullEventOld = oldPull
 _G.os.pullEvent = os.pullEventRaw
+local version = "4.3"
 
 local function boot()
 	term.clear()
@@ -12,7 +13,7 @@ local function boot()
 	local success, loaded = pcall(loadfile ,parentDir.."boot/loader.lua")
 	if success and loaded then
 		term.write("I")
-		local a,b = pcall(loaded,parentDir)
+		local a,b = pcall(loaded,parentDir,version)
 		if not a then
 			while true do
 				sleep()
