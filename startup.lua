@@ -14,10 +14,11 @@ local function boot()
 		term.write("I")
 		local a,b = pcall(loaded,parentDir)
 		if not a then
-			printError(b)
+			while true do
+				sleep()
+			end
 		end
 	else
-		--os.run({},parentDir.."boot/loader.lua",parentDir,version)
 		while true do
 			sleep()
 		end

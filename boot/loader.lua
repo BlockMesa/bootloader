@@ -27,7 +27,7 @@ local function boot(kernel,timeout,name,...)
 end
 local function startBoot(bootDrive)
 	term.write("L")
-	if not fs.find(parentDir.."/map.json") then
+	if not fs.exists(parentDir.."/map.json") then
 		while true do
 			sleep()
 		end
@@ -40,7 +40,7 @@ local function startBoot(bootDrive)
 	end
 	local file = fs.open(parentDir.."map.json", "r")
 	if file == nil then
-		term.write("-") --file doesnt exist
+		term.write("-") --for some reason the file isnt accessible
 		while true do
 			sleep()
 		end
